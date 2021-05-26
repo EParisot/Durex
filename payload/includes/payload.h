@@ -24,8 +24,11 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <errno.h>
+#include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
 
 #define REMOTE_ADDR "0.0.0.0"
 #define REMOTE_PORT 4242
+#define MAX_CLIENTS 3
 
 #endif
