@@ -142,7 +142,7 @@ int r_shell(void)
 
 		if ((activity < 0) && (errno != EINTR))  
         {  
-            printf("error select\n");  
+            //printf("error select\n");  
         }
 		//If something happened on the master socket, then its an incoming connection 
         if (FD_ISSET(master_sd, &readfds))  
@@ -180,9 +180,8 @@ int r_shell(void)
 			if (strncmp(buffer, "pass", 4))
 			{
 				send(new_socket, conn_refused_msg, strlen(conn_refused_msg), 0);
-				close(master_sd);
 				close(new_socket);
-				return 1;
+				continue;
 			}
 			send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
 			//printf("Welcome message sent successfully\n");  
