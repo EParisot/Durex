@@ -116,16 +116,31 @@ int setup_server(int *master_sd, int *clients_sockets, struct sockaddr_in *serve
 	return 0;
 }
 
+int generate_key(char *key)
+{
+	//int fd = 0;
+
+	memset(key, 0, 17);
+	/*if ((fd = open("/dev/urandom", O_RDONLY)) < 0)
+		return -1;
+	if (read(fd, key, 16) < 0)
+		return -1;*/
+	strcpy(key, "abcdefghijklmnop");
+	key[16] = 0;
+	return 0;
+}
+
 int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 {
 	struct sockaddr_in client_address;
 	socklen_t client_addr_size = sizeof(struct sockaddr_in);
 	int new_socket = 0;
-	char buffer[1025] = {0};
-	char hello_msg[] = "Password: ";
+    char buffer[1025];
 	char conn_refused_msg[] = "Connexion refused\n";
-	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n>: ";
+	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n";
+	char handshake[17];
 
+	memset(buffer, 0, 1025);
 	if (FD_ISSET(*master_sd, readfds))  
 	{
 		if ((new_socket = accept(*master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
@@ -136,7 +151,8 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		}
 		//add new socket to array of sockets 
 		int found = 0;
-		for (int i = 0; i < MAX_CLIENTS; i++)  
+		int i = 0;
+		for (i = 0; i < MAX_CLIENTS; i++)  
 		{
 			//if position is empty 
 			if(clients_sockets[i] == 0)  
@@ -149,24 +165,44 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		if (found == 0)
 			return 1;
 		//inform user of socket number - used in send and receive commands 
-		printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
-		send(new_socket, hello_msg, strlen(hello_msg), 0);
+		//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
+
+		if (generate_key(handshake))
+		{
+			printf("error generating random handshake\n");
+			close(*master_sd);
+			return -1;
+		}
+		send(clients_sockets[i], handshake, 16, 0);
 		// check password
-		if (read(new_socket, buffer, 1024) < 0)
+		if (read(clients_sockets[i], buffer, 16) < 0)
 		{
 			printf("error reading socket content\n");
 			close(*master_sd);
 			return -1;
 		}
-		if (strncmp(buffer, "pass", 4))
+		buffer[16] = 0;
+		//printf("sent handshake %s\n", handshake);
+		if (rabbit(handshake, KEY, IV))
 		{
-			send(new_socket, conn_refused_msg, strlen(conn_refused_msg), 0);
-			close(new_socket);
-			printf("Connexion refused message sent successfully\n");  
+			printf("error encrypting handshake\n");
+			close(*master_sd);
+			return -1;
+		}
+		if (strcmp(buffer, handshake))
+		{
+			send(clients_sockets[i], conn_refused_msg, strlen(conn_refused_msg), 0);
+			clients_sockets[i] = 0;
+			close(clients_sockets[i]);
+			//printf("crypt handshake %s\n", handshake);
+			//printf("rcvd handshake: %s\n", buffer);
+			//printf("Connexion refused message sent successfully\n");  
 			return 1;
 		}
-		send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
-		printf("Welcome message sent successfully\n");  
+		//printf("crypt handshake %s\n", handshake);
+		//printf("rcvd handshake: %s\n", buffer);
+		send(clients_sockets[i], welcome_msg, strlen(welcome_msg), 0);
+		//printf("Welcome message sent successfully\n");  
 	}
 	return 0;
 }
@@ -227,7 +263,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 				//Somebody disconnected , get his details and print 
 				//getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
 				//printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-				printf("Client disconnected sd: %d\n", sd);	
+				//printf("Client disconnected sd: %d\n", sd);	
 				//Close the socket and mark as 0 in list for reuse 
 				close(sd);
 				clients_sockets[i] = 0;

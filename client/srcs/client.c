@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 	int sock = 0;
 	int valread;
 	int secured = 0;
-    
+	char key[17];
     char buffer[1025] = {0};
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -72,21 +72,31 @@ int main(int argc, char *argv[])
 	{
 		if (secured == 0)
 		{
-			valread = read(sock , buffer, 1024);
-			char password[16];
-			memset(password, 0, 16);
-			if (valread >= 0 && strncmp(buffer, "Password: ", 10) == 0)
-			{
-				buffer[valread] = '\0';
-				printf("%s", buffer);
+			//valread = read(sock , buffer, 10);
+			//if (valread >= 0 && strncmp(buffer, "Password: ", 10) == 0)
+			//{
+			//	buffer[valread] = '\0';
+				valread = read(sock, buffer, 1024);
+				//printf("rcvd handshake %s\n", buffer);
+				buffer[16] = 0;
 				// key exchange
-				if(fgets(password, 16, stdin) == NULL)
+				printf("Password: ");
+				memset(key, 0, 17);
+				if(fgets(key, 17, stdin) == NULL)
 				{
 					printf("error: reading stdin failed\n");
+					break;
 				}
-				send(sock, password, strlen(password), 0);
-				valread = read(sock , buffer, 1024);
-				buffer[valread] = '\0';
+				if (rabbit(buffer, KEY, IV))
+				{
+					printf("error: encrypting key\n");
+					break;
+				}
+				//printf("key: %s KEY = %s : %d\n", key, KEY, strcmp(key, KEY));
+				//printf("sent key: %s\n", buffer);
+				send(sock, buffer, 16, 0);
+				valread = read(sock, buffer, 1024);
+				buffer[valread] = 0;
 				printf("%s", buffer);
 				if (strncmp(buffer, "Welcome", 7) == 0)
 				{
@@ -96,7 +106,7 @@ int main(int argc, char *argv[])
 				{
 					continue;
 				}
-			}
+			//}
 		}
 		else
 		{

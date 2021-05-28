@@ -33,6 +33,9 @@
 #define REMOTE_PORT 4242
 #define MAX_CLIENTS 3
 
-int 	rabbit(char *input, char *key, char *iv);
+#define KEY "secret__password"
+#define IV 	"secretiv"
+
+int 	rabbit(char *input, const char *key, const char *iv);
 
 #endif

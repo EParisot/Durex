@@ -12,9 +12,6 @@
 
 #include "../includes/payload.h"
 
-#define KEY "shqs8N674çzqiàis"
-#define IV "gs6SHzèf"
-
 #define WORDSIZE 0x100000000
 #define LSW(n) (n << 8) >> 8
 #define MSW(n) (n >> 8) << 8
@@ -52,11 +49,11 @@ static unsigned int *rabbit_round(unsigned int *C, unsigned int *A, unsigned int
 	return X;
 }
 
-int rabbit(char *input, char *key, char *iv)
+int rabbit(char *input, const char *key, const char *iv)
 {
 	unsigned int 	X[8];
 	unsigned int 	C[8];
-	short			K[16];
+	short			K[8];
 	unsigned int 	G[8];
 	unsigned int 	A[8];
 	unsigned int 	b = 0;
@@ -64,7 +61,7 @@ int rabbit(char *input, char *key, char *iv)
 
 	memset(X, 0, 8 * sizeof(unsigned int));
 	memset(C, 0, 8 * sizeof(unsigned int));
-	memset(K, 0, 1 * sizeof(unsigned int));
+	memset(K, 0, 8 * sizeof(short));
 	memset(G, 0, 8 * sizeof(unsigned int));
 	memset(A, 0, 8 * sizeof(unsigned int));
 

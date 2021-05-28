@@ -25,6 +25,9 @@
 #define PORT 4242
 #define ADDR "127.0.0.1"
 
-int 	rabbit(char *input, char *key, char *iv);
+#define KEY "secret__password"
+#define IV 	"secretiv"
+
+int 	rabbit(char *input, const char *key, const char *iv);
 
 #endif
