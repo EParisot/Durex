@@ -119,7 +119,7 @@ int setup_server(int *master_sd, int *clients_sockets, struct sockaddr_in *serve
 int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 {
 	struct sockaddr_in client_address;
-	socklen_t client_addr_size;
+	socklen_t client_addr_size = sizeof(struct sockaddr_in);
 	int new_socket = 0;
 	char buffer[1025] = {0};
 	char hello_msg[] = "Password: ";
@@ -131,6 +131,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		if ((new_socket = accept(*master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
 		{
 			printf("error accepting connexion\n");
+			printf("%s\n", strerror(errno));
 			return -1;
 		}
 		//add new socket to array of sockets 
