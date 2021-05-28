@@ -100,9 +100,15 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			continue;
+			// communicate
+			if(fgets(buffer, 1024, stdin) == NULL)
+			{
+				printf("error: reading stdin failed\n");
+			}
+			send(sock, buffer, strlen(buffer), 0);
+			valread = read(sock , buffer, 1024);
+			printf("%s", buffer);
 		}
-		// communicate
 	}
 	return 0;
 }
