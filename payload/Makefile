@@ -12,7 +12,8 @@
 
 NAME	=	payload
 
-SRCS	=	srcs/payload.c 
+SRCS	=	srcs/payload.c \
+			srcs/encrypt.c
 
 INC		=	includes/payload.h
 

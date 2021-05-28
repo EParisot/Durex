@@ -10,48 +10,31 @@
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	Durex
+NAME	=	client
 
-SRCS	=	srcs/durex.c 
+SRCS	=	srcs/client.c \
+			srcs/encrypt.c
 
-INC		=	includes/durex.h
+INC		=	includes/client.h
 
 OBJS	=	$(SRCS:.c=.o)
-
-LIBS	=	libft/libft.a
-
-PAYLOAD =	payload/payload
-
-CLIENT =	client/client
 
 CFLAGS	=	-Wall -Wextra -Werror -g3
 
 RM 		= 	rm -rf
 
-all		:	$(LIBS) $(NAME) $(PAYLOAD) $(CLIENT)
+all		:	$(NAME)
 
 $(NAME)	:	$(OBJS) $(INC)
-	gcc $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-
-$(LIBS)	: 	.FORCE
-	@$(MAKE) -C libft
-
-$(PAYLOAD) : .FORCE
-	@$(MAKE) -C payload
-
-$(CLIENT) : .FORCE
-	@$(MAKE) -C client
+	gcc $(CFLAGS) $(OBJS) -o $(NAME)
 
 .FORCE	:
 
 clean	:
 	$(RM) $(OBJS)
-	$(MAKE) clean -C libft
-	$(MAKE) clean -C payload
-	$(MAKE) clean -C client
 
 fclean	:	clean
-	$(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) _Durex
+	$(RM) $(NAME)
 
 re		:	fclean all
 

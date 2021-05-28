@@ -141,8 +141,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			//if position is empty 
 			if(clients_sockets[i] == 0)  
 			{  
-				clients_sockets[i] = new_socket;  
-				printf("Adding to list of sockets as %d\n", i);  
+				clients_sockets[i] = new_socket;
 				found = 1;
 				break;  
 			}
@@ -163,6 +162,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		{
 			send(new_socket, conn_refused_msg, strlen(conn_refused_msg), 0);
 			close(new_socket);
+			printf("Connexion refused message sent successfully\n");  
 			return 1;
 		}
 		send(new_socket, welcome_msg, strlen(welcome_msg), 0); 
@@ -227,7 +227,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 				//Somebody disconnected , get his details and print 
 				//getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
 				//printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-				printf("Host disconnected sd: %d", sd);	
+				printf("Client disconnected sd: %d\n", sd);	
 				//Close the socket and mark as 0 in list for reuse 
 				close(sd);
 				clients_sockets[i] = 0;
