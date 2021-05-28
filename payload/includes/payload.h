@@ -26,6 +26,8 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
+#include <sys/wait.h>
+#include <sys/mman.h>
 
 #define REMOTE_ADDR "0.0.0.0"
 #define REMOTE_PORT 4242
