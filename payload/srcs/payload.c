@@ -189,6 +189,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			close(*master_sd);
 			return -1;
 		}
+		//printf("%s:%ld %s:%ld\n", buffer, strlen(buffer), handshake, strlen(handshake));
 		if (strcmp(buffer, handshake))
 		{
 			send(clients_sockets[i], conn_refused_msg, strlen(conn_refused_msg), 0);

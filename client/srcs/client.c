@@ -80,6 +80,7 @@ int main(int argc, char *argv[])
 				//printf("rcvd handshake %s\n", buffer);
 				buffer[16] = 0;
 				// key exchange
+				//printf("rcvd handshake: %s\n", buffer);
 				printf("Password: ");
 				memset(key, 0, 17);
 				if(fgets(key, 17, stdin) == NULL)
@@ -87,13 +88,13 @@ int main(int argc, char *argv[])
 					printf("error: reading stdin failed\n");
 					break;
 				}
-				if (rabbit(buffer, KEY, IV))
+				if (rabbit(buffer, key, IV)) // KEY works, key doesn't... FUCK !
 				{
 					printf("error: encrypting key\n");
 					break;
 				}
 				//printf("key: %s KEY = %s : %d\n", key, KEY, strcmp(key, KEY));
-				//printf("sent key: %s\n", buffer);
+				//printf("sent handshake: %s\n", buffer);
 				send(sock, buffer, 16, 0);
 				valread = read(sock, buffer, 1024);
 				buffer[valread] = 0;
