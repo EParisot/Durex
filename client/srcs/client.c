@@ -54,9 +54,10 @@ int main(int argc, char *argv[])
 	int sock = 0;
 	int valread;
 	int secured = 0;
-	char key[17];
-    char buffer[1025] = {0};
+	char key[1025];
+    char buffer[1025];
 
+	memset(buffer, 0, 1025);
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         printf("error: Creating Socket\n");
@@ -76,18 +77,18 @@ int main(int argc, char *argv[])
 			buffer[16] = 0;
 			// key exchange
 			printf("Password: ");
-			memset(key, 0, 17);
-			if(fgets(key, 17, stdin) == NULL)
+			memset(key, 0, 1025);
+			if(fgets(key, 1024, stdin) == NULL)
 			{
 				printf("error: reading stdin failed\n");
 				break;
 			}
-			if (rabbit(buffer, key, IV))
+			if (rabbit(buffer, key))
 			{
 				printf("error: encrypting key\n");
 				break;
 			}
-			send(sock, buffer, 16, 0);
+			send(sock, buffer, 17, 0);
 			valread = read(sock, buffer, 1024);
 			buffer[valread] = 0;
 			printf("%s", buffer);
@@ -110,7 +111,7 @@ int main(int argc, char *argv[])
 			send(sock, buffer, strlen(buffer), 0);
 			valread = read(sock , buffer, 1024);
 			buffer[valread] = 0;
-			printf("%s", buffer);
+			printf("%s\n$> ", buffer);
 		}
 	}
 	return 0;

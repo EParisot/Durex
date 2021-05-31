@@ -34,8 +34,7 @@
 #define MAX_CLIENTS 3
 
 #define KEY "secret__password"
-#define IV 	"secretiv"
 
-int 	rabbit(char *input, const char *key, const char *iv);
+int 	rabbit(char *input, const char *key);
 
 #endif

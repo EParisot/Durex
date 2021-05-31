@@ -49,7 +49,7 @@ static unsigned int *rabbit_round(unsigned int *C, unsigned int *A, unsigned int
 	return X;
 }
 
-int rabbit(char *input, const char *key, const char *iv)
+int rabbit(char *input, const char *key)
 {
 	unsigned int 	X[8];
 	unsigned int 	C[8];
@@ -103,27 +103,10 @@ int rabbit(char *input, const char *key, const char *iv)
 		rabbit_round(C, A, G, X, &b);
 	}
 
-	// IV Setup Scheme
-	C[0] = C[0] ^ ((unsigned int *)iv)[0];
-	C[1] = C[1] ^ (((short *)iv)[5] | ((short *)iv)[2]);
-	C[2] = C[2] ^ ((unsigned int *)iv)[4];
-	C[3] = C[3] ^ (((short *)iv)[4] | ((short *)iv)[0]);
-	C[4] = C[4] ^ ((unsigned int *)iv)[0];
-	C[5] = C[5] ^ (((short *)iv)[5] | ((short *)iv)[2]);
-	C[6] = C[6] ^ ((unsigned int *)iv)[4];
-	C[7] = C[7] ^ (((short *)iv)[4] | ((short *)iv)[0]);
-
-	// init IV loop
-	for (int i = 0; i < 4; ++i)
-	{
-		rabbit_round(C, A, G, X, &b);
-	}
-
-	//printf("Algo Ready\n");
-
 	// main loop
 	int done = 0;
 	int str_c = 0;
+
 	while (!done)
 	{
 		S[0] = ((short *)X)[0] ^ ((short *)X)[11];
