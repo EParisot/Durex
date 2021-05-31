@@ -290,14 +290,14 @@ int server_loop(int *master_sd, int *clients_sockets)
 	int activity;
 	int max_sd = 0; 
 	
-	//clear the socket set 
-	FD_ZERO(&readfds);
-	//add master socket to set 
-	FD_SET(*master_sd, &readfds);  
-	max_sd = *master_sd;
-
 	while (1)
 	{
+		//clear the socket set 
+		FD_ZERO(&readfds);
+		//add master socket to set 
+		FD_SET(*master_sd, &readfds);  
+		max_sd = *master_sd;
+		//add child sockets to set 
 		for (int i = 0; i < MAX_CLIENTS; i++)  
 		{                  
 			//if valid socket descriptor then add to read list 
