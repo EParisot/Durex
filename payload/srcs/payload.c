@@ -136,7 +136,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 	int new_socket = 0;
     char buffer[1025];
 	char conn_refused_msg[] = "Connexion refused\n";
-	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n\tstop:\tstop server\n";
+	char welcome_msg[] = "Welcome !\nCommands:\n\tshell:\tspawn a shell\n";
 	char handshake[17];
 
 	memset(buffer, 0, 1025);
