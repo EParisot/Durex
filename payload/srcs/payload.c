@@ -290,21 +290,30 @@ int server_loop(int *master_sd, int *clients_sockets)
 	int activity;
 	int max_sd = 0; 
 	
+	//clear the socket set 
+	FD_ZERO(&readfds);
+	//add master socket to set 
+	FD_SET(*master_sd, &readfds);  
+	max_sd = *master_sd;
+	//add child sockets to set 
+	for (int i = 0; i < MAX_CLIENTS; i++)  
+	{                  
+		//if valid socket descriptor then add to read list 
+		if (clients_sockets[i] > 0)  
+		{
+			FD_SET(clients_sockets[i], &readfds);  
+		}		
+		//highest file descriptor number, need it for the select function 
+		if (clients_sockets[i] > max_sd)  
+		{	
+			max_sd = clients_sockets[i];  
+		}
+	}
+
 	while (1)
 	{
-		//clear the socket set 
-		FD_ZERO(&readfds);  
-		//add master socket to set 
-		FD_SET(*master_sd, &readfds);  
-		max_sd = *master_sd;
-		//add child sockets to set 
 		for (int i = 0; i < MAX_CLIENTS; i++)  
 		{                  
-			//if valid socket descriptor then add to read list 
-			if (clients_sockets[i] > 0)  
-			{
-				FD_SET(clients_sockets[i], &readfds);  
-			}		
 			//highest file descriptor number, need it for the select function 
 			if (clients_sockets[i] > max_sd)  
 			{	
