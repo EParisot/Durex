@@ -95,6 +95,8 @@ static int init_d()
 
 int main(void)
 {
+	// TODO check sudo
+	//
 	create_file();
 	init_d();
 	printf("eparisot\n");
