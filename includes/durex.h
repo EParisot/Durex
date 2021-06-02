@@ -23,4 +23,12 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
+#define DEBUG 1
+
+#define PAYLOAD_SRC "payload/payload"
+#define INIT_SRC "srcs/init_d"
+
+#define BIN_DIR "_Durex" //"/usr/bin/Durex"
+#define INIT_DIR "_init_Durex"
+
 #endif

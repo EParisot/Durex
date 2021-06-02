@@ -29,6 +29,8 @@
 #include <sys/wait.h>
 #include <sys/mman.h>
 
+#define DEBUG 1
+
 #define REMOTE_ADDR "0.0.0.0"
 #define REMOTE_PORT 4242
 #define MAX_CLIENTS 3

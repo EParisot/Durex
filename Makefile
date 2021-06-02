@@ -51,7 +51,7 @@ clean	:
 	$(MAKE) clean -C client
 
 fclean	:	clean
-	$(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) _Durex
+	$(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) _Durex _init_Durex
 
 re		:	fclean all
 

