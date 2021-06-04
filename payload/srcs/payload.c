@@ -176,8 +176,8 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 		}
 		if (found == 0)
 			return 1;
-		// new connexion
-		// handshake from server
+		//inform user of socket number - used in send and receive commands 
+		//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
 		if (generate_key(handshake))
 		{
 			(DEBUG) ? printf("error generating random handshake\n") : 0;
@@ -185,7 +185,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			return -1;
 		}
 		send(clients_sockets[i], handshake, 17, 0);
-		// check hanshake
+		// check password
 		if (read(clients_sockets[i], buffer, 1025) < 0)
 		{
 			(DEBUG) ? printf("error reading socket content\n") : 0;
@@ -206,36 +206,6 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			clients_sockets[i] = 0;
 			sleep(3);
 			return 1;
-		}
-		send(clients_sockets[i], "OK", strlen("OK"), 0);
-		// hanshake from client
-		if (read(clients_sockets[i], buffer, 1025) < 0)
-		{
-			(DEBUG) ? printf("error reading socket content\n") : 0;
-			close(*master_sd);
-			return -1;
-		}
-		buffer[16] = 0;
-		if (rabbit(buffer, KEY))
-		{
-			(DEBUG) ? printf("error encrypting handshake\n") : 0;
-			close(*master_sd);
-			return -1;
-		}
-		send(clients_sockets[i], buffer, 17, 0);
-		// check client handshale response
-		if (read(clients_sockets[i], buffer, 1025) < 0)
-		{
-			(DEBUG) ? printf("error reading socket content\n") : 0;
-			close(*master_sd);
-			return -1;
-		}
-		buffer[3] = 0;
-		if (strcmp(buffer, "OK") != 0)
-		{
-			(DEBUG) ? printf("error bad handshake from client\n") : 0;
-			close(*master_sd);
-			return -1;
 		}
 		send(clients_sockets[i], welcome_msg, strlen(welcome_msg), 0);
 	}
