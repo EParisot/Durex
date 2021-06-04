@@ -265,11 +265,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 			//Check if it was for closing , and also read the incoming message 
 			if ((valread = read(sd, buffer, 1024)) == 0)
 			{
-				//Somebody disconnected , get his details and print 
-				//getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
-				//printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-				printf("Client disconnected sd: %d\n", sd);	
-				//Close the socket and mark as 0 in list for reuse 
+				//Somebody disconnected, close the socket and mark as 0 in list for reuse 
 				close(sd);
 				clients_sockets[i] = 0;
 			}
@@ -291,8 +287,10 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 						continue;
 					}
 				}
-				// echo
-				//send(sd, buffer, strlen(buffer), 0); 
+				else
+				{
+					send(sd, "command not found\n", strlen("command not found\n"), 0); 
+				}
 			}
 		}
 	}
