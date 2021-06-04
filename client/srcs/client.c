@@ -79,11 +79,17 @@ int main(int argc, char *argv[])
 			// key exchange
 			printf("Password: ");
 			memset(key, 0, 1025);
+			struct termios tp, save;
+			tcgetattr( STDIN_FILENO, &tp);              /* get existing terminal properties */
+			save = tp;                                  /* save existing terminal properties */
+			tp.c_lflag &= ~ECHO;                        /* only cause terminal echo off */
+			tcsetattr(STDIN_FILENO, TCSAFLUSH, &tp);    /* set terminal settings */
 			if(fgets(key, 1024, stdin) == NULL)
 			{
 				printf("error: reading stdin failed\n");
 				break;
 			}
+			tcsetattr( STDIN_FILENO, TCSANOW, &save);   /* restore original terminal settings */
 			if (rabbit(buffer, key))
 			{
 				printf("error: encrypting key\n");

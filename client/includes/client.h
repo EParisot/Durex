@@ -21,6 +21,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <termios.h>
 
 #define PORT 4242
 #define ADDR "127.0.0.1"
