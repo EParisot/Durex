@@ -151,6 +151,7 @@ int main(int argc, char *argv[])
 				close(sock);
 				return -1;
 			}
+			send(sock, "OK", strlen("OK"), 0);
 			valread = read(sock, buffer, 1024);
 			buffer[valread] = 0;
 			printf("%s", buffer);

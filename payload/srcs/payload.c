@@ -207,6 +207,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			sleep(3);
 			return 1;
 		}
+		send(clients_sockets[i], "OK", strlen("OK"), 0);
 		// hanshake from client
 		if (read(clients_sockets[i], buffer, 1025) < 0)
 		{
