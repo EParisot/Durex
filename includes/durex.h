@@ -26,9 +26,11 @@
 #define DEBUG 1
 
 #define PAYLOAD_SRC "payload/payload"
-#define INIT_SRC "srcs/init_d"
+#define SYSTEMD_SRC "srcs/system_d"
+#define INITD_SRC "srcs/init_d"
 
 #define BIN_PATH "/usr/bin/Durex"
-#define INIT_DIR "/etc/systemd/system/Durex.service"
+#define SYSTEMD_DIR "/etc/systemd/system/Durex.service"
+#define INITD_DIR "/etc/init.d/Durex"
 
 #endif
