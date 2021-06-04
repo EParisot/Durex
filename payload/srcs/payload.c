@@ -14,8 +14,7 @@
 
 void handle_signals(int signum)
 {
-	// SIGCHILD -> do nothing
-	if (signum == 17)
+	if (signum == SIGCHLD || signum == SIGHUP)
 		return ;
 	(DEBUG) ? printf("error signal in payload") : 0;
 	exit(EXIT_FAILURE);
