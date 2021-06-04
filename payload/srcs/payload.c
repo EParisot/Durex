@@ -268,7 +268,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 				//Somebody disconnected , get his details and print 
 				//getpeername(sd, (struct sockaddr*)&client_address, &client_addr_size);  
 				//printf("Host disconnected , ip %s , port %d \n", inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
-				//printf("Client disconnected sd: %d\n", sd);	
+				printf("Client disconnected sd: %d\n", sd);	
 				//Close the socket and mark as 0 in list for reuse 
 				close(sd);
 				clients_sockets[i] = 0;
