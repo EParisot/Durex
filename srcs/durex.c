@@ -51,7 +51,8 @@ static int create_file()
 	// read payload content
 	void *obj = NULL;
 	size_t obj_size = 0;
-	// tmp
+	// read payload
+	// TODO use hardcoded code
 	if (read_obj(PAYLOAD_SRC, &obj, &obj_size))
 	{
 		close(durex_fd);
@@ -77,6 +78,7 @@ static int init_d()
 		return -1;
 	}
 	// read init file content
+	// TODO use hardcoded code
 	if (read_obj(INIT_SRC, &obj, &obj_size))
 	{
 		close(init_fd);
