@@ -72,7 +72,7 @@ static int init_d()
 	void *obj = NULL;
 	size_t obj_size = 0;
 
-	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0655)) < 0)
+	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 	{
 		return -1;
 	}

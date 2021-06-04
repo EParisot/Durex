@@ -51,8 +51,8 @@ clean	:
 	$(MAKE) clean -C client
 
 fclean	:	clean
-	systemctl stop Durex.service
-	systemctl disable Durex.service
+	-sudo systemctl stop Durex.service
+	-sudo systemctl disable Durex.service
 	sudo $(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service $2>/dev/null
 
 re		:	fclean all
