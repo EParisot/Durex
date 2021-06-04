@@ -325,6 +325,7 @@ int server_loop(int *master_sd, int *clients_sockets)
 				max_sd = clients_sockets[i];  
 			}
 		}
+		sleep(3);
 		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely
 		activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
 		if ((activity < 0) && (errno != EINTR))

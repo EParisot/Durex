@@ -58,16 +58,16 @@ int main(int argc, char *argv[])
     char buffer[1025];
 
 	memset(buffer, 0, 1025);
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-    {
-        printf("error: Creating Socket\n");
-        return -1;
-    }
 	
 	while (1)
 	{
 		if (secured == 0)
 		{
+			if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+			{
+				printf("error: Creating Socket\n");
+				return -1;
+			}
 			// connect to server
 			if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
 			{
@@ -99,6 +99,8 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				close(sock);
+				sleep(1);
 				continue;
 			}
 		}
