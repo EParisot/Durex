@@ -233,7 +233,7 @@ int spawn_shell(int *clients_sockets)
 	}
 	send(*clients_sockets, "\n", 1, 0);
 	// parent fork again
-	/*int pid = fork();
+	int pid = fork();
 	if (pid < 0)
 	{
 		exit(EXIT_FAILURE);
@@ -244,7 +244,7 @@ int spawn_shell(int *clients_sockets)
 		waitpid(shell_pid, 0, 0);
 		*clients_sockets = -*clients_sockets;
 		exit(EXIT_SUCCESS);
-	}*/
+	}
 	return 0;
 }
 
