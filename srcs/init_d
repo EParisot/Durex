@@ -6,8 +6,10 @@ After=network-online.target
 Type=simple
 ExecStart=/usr/bin/Durex
 RemainAfterExit=yes
+# Allow user to pkill and then don't try to restart
 KillMode=process
 Restart=always
+RestartSec=3
 # Configures the time to wait before service is stopped forcefully.
 TimeoutStopSec=300
  
