@@ -63,16 +63,17 @@ int main(int argc, char *argv[])
         printf("error: Creating Socket\n");
         return -1;
     }
-	// connect to server
-	if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-    {
-        printf("error: Connection Failed \n");
-        return -1;
-    }
+	
 	while (1)
 	{
 		if (secured == 0)
 		{
+			// connect to server
+			if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+			{
+				printf("error: Connection Failed \n");
+				return -1;
+			}
 			valread = read(sock, buffer, 1024);
 			buffer[16] = 0;
 			// key exchange
