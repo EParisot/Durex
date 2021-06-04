@@ -12,6 +12,14 @@
 
 #include "../includes/payload.h"
 
+void handle_signals(int signum)
+{
+	if (signum == SIGCHLD || signum == SIGHUP)
+		return ;
+	(DEBUG) ? printf("error signal in payload") : 0;
+	exit(EXIT_FAILURE);
+}
+
 int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile)
 {
 	pid_t pid;
@@ -41,6 +49,12 @@ int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile
 	// Catch, ignore and handle signals
 	signal(SIGCHLD, SIG_IGN);
     signal(SIGHUP, SIG_IGN);
+    // Implement a real signal handler
+	struct sigaction action;
+	memset(&action, 0, sizeof(action));
+	action.sa_handler = handle_signals;
+	for (int i = 0; i < 32; ++i)
+    	sigaction(i, &action, 0);
 	// Fork off for the second time
     pid = fork();
     // An error occurred
