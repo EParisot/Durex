@@ -204,6 +204,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			send(clients_sockets[i], conn_refused_msg, strlen(conn_refused_msg), 0);
 			clients_sockets[i] = 0;
 			close(clients_sockets[i]);
+			close(new_socket);
 			sleep(3);
 			return 1;
 		}
