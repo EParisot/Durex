@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
 			send(sock, buffer, strlen(buffer), 0);
 			valread = read(sock , buffer, 1024);
 			buffer[valread] = 0;
-			printf("%s\n$> ", buffer);
+			printf("%s\n", buffer);
 		}
 	}
 	return 0;
