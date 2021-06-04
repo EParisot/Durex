@@ -54,6 +54,7 @@ fclean	:	clean
 	-sudo systemctl stop Durex.service
 	-sudo systemctl disable Durex.service
 	-sudo systemctl daemon-reload
+	-sudo pkill Durex
 	sudo $(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service $2>/dev/null
 
 re		:	fclean all
