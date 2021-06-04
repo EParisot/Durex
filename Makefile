@@ -51,7 +51,7 @@ clean	:
 	$(MAKE) clean -C client
 
 fclean	:	clean
-	$(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) _Durex _init_Durex
+	sudo $(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service $2>/dev/null
 
 re		:	fclean all
 

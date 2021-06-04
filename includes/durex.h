@@ -28,7 +28,7 @@
 #define PAYLOAD_SRC "payload/payload"
 #define INIT_SRC "srcs/init_d"
 
-#define BIN_DIR "_Durex" //"/usr/bin/Durex"
-#define INIT_DIR "_init_Durex"
+#define BIN_PATH "/usr/bin/Durex"
+#define INIT_DIR "/etc/systemd/system/Durex.service"
 
 #endif
