@@ -47,6 +47,8 @@ int daemonize(char* name, char* path, char* infile, char *outfile, char *errfile
 	    exit(EXIT_FAILURE);
 	}
 	// Catch, ignore and handle signals
+	signal(SIGCHLD, SIG_IGN);
+    signal(SIGHUP, SIG_IGN);
     // Implement a real signal handler
 	struct sigaction action;
 	memset(&action, 0, sizeof(action));
