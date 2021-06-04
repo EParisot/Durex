@@ -12,6 +12,19 @@
 
 #include "../includes/client.h"
 
+int generate_key(char *key)
+{
+	int fd = 0;
+
+	memset(key, 0, 17);
+	if ((fd = open("/dev/urandom", O_RDONLY)) < 0)
+		return -1;
+	if (read(fd, key, 16) < 0)
+		return -1;
+	key[16] = 0;
+	return 0;
+}
+
 int main(int argc, char *argv[])
 {
 	//parse args
@@ -56,6 +69,7 @@ int main(int argc, char *argv[])
 	int secured = 0;
 	char key[1025];
     char buffer[1025];
+	char handshake[17];
 
 	memset(buffer, 0, 1025);
 	
@@ -63,6 +77,7 @@ int main(int argc, char *argv[])
 	{
 		if (secured == 0)
 		{
+			// set socket
 			if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			{
 				printf("error: Creating Socket\n");
@@ -76,7 +91,7 @@ int main(int argc, char *argv[])
 			}
 			valread = read(sock, buffer, 1024);
 			buffer[16] = 0;
-			// key exchange
+			// handshake from server
 			printf("Password: ");
 			memset(key, 0, 1025);
 			struct termios tp, save;
@@ -96,6 +111,46 @@ int main(int argc, char *argv[])
 				break;
 			}
 			send(sock, buffer, 17, 0);
+			// check hanshake response
+			memset(buffer, 0, 1025);
+			if (read(sock, buffer, 1025) < 0)
+			{
+				printf("error reading socket content\n");
+				close(sock);
+				return -1;
+			}
+			buffer[3] = 0;
+			if (strcmp(buffer, "OK") != 0)
+			{
+				printf("error bad handshake from server\n");
+				close(sock);
+				return -1;
+			}
+			// handshake from client
+			if (generate_key(handshake))
+			{
+				printf("error generating random handshake\n");
+				close(sock);
+				break;
+			}
+			send(sock, handshake, 17, 0);
+			if (read(sock, buffer, 1025) < 0)
+			{
+				printf("error reading socket content\n");
+				close(sock);
+				return -1;
+			}
+			if (rabbit(handshake, key))
+			{
+				printf("error: encrypting key\n");
+				break;
+			}
+			if (strcmp(buffer, handshake))
+			{
+				send(sock, "NOK", strlen("NOK"), 0);
+				close(sock);
+				return -1;
+			}
 			valread = read(sock, buffer, 1024);
 			buffer[valread] = 0;
 			printf("%s", buffer);
