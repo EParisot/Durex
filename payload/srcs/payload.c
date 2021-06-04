@@ -204,6 +204,7 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 			send(clients_sockets[i], conn_refused_msg, strlen(conn_refused_msg), 0);
 			clients_sockets[i] = 0;
 			close(clients_sockets[i]);
+			sleep(3);
 			return 1;
 		}
 		send(clients_sockets[i], welcome_msg, strlen(welcome_msg), 0);
@@ -325,7 +326,6 @@ int server_loop(int *master_sd, int *clients_sockets)
 				max_sd = clients_sockets[i];  
 			}
 		}
-		sleep(3);
 		//wait for an activity on one of the sockets, timeout is NULL, so wait indefinitely
 		activity = select(max_sd + 1, &readfds, NULL, NULL, NULL);
 		if ((activity < 0) && (errno != EINTR))
