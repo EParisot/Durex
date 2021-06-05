@@ -38,6 +38,15 @@
 
 #define KEY "secret__password"
 
+typedef struct  env_s
+{
+	char 		key[17];
+	int 		nb_clients;
+	int 		master_sd;
+	fd_set      readfds;
+	int 		*clients_sockets;
+}				env_t;
+
 typedef struct 	wait_args_s
 {
 	int 		pid;
