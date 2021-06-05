@@ -18,26 +18,26 @@ INC		=	includes/durex.h
 
 OBJS	=	$(SRCS:.c=.o)
 
-LIBS	=	libft/libft.a
-
 PAYLOAD =	payload/payload
 
-CLIENT =	client/client
+PACKER  =	woody_woodpacker/woody_woodpacker
+
+CLIENT  =	client/client
 
 CFLAGS	=	-Wall -Wextra -Werror -g3
 
 RM 		= 	rm -rf
 
-all		:	$(LIBS) $(NAME) $(PAYLOAD) $(CLIENT)
+all		:	$(NAME) $(PAYLOAD) $(PACKER) $(CLIENT)
 
 $(NAME)	:	$(OBJS) $(INC)
-	gcc $(CFLAGS) $(OBJS) $(LIBS) -o $(NAME)
-
-$(LIBS)	: 	.FORCE
-	@$(MAKE) -C libft
+	gcc $(CFLAGS) $(OBJS) -o $(NAME)
 
 $(PAYLOAD) : .FORCE
 	@$(MAKE) -C payload
+
+$(PACKER) : .FORCE
+	@$(MAKE) -C woody_woodpacker
 
 $(CLIENT) : .FORCE
 	@$(MAKE) -C client
@@ -46,8 +46,8 @@ $(CLIENT) : .FORCE
 
 clean	:
 	$(RM) $(OBJS)
-	$(MAKE) clean -C libft
 	$(MAKE) clean -C payload
+	$(MAKE) clean -C woody_woodpacker
 	$(MAKE) clean -C client
 
 fclean	:	clean
@@ -57,7 +57,7 @@ fclean	:	clean
 	-sudo /etc/init.d/Durex stop
 	-sudo update-rc.d -f Durex remove
 	-sudo pkill Durex
-	sudo $(RM) $(NAME) woody $(LIBS) $(PAYLOAD) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service /etc/init.d/Durex.service $2>/dev/null
+	sudo $(RM) $(NAME) $(PAYLOAD) $(PACKER) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service /etc/init.d/Durex.service $2>/dev/null
 
 re		:	fclean all
 

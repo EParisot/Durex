@@ -16,7 +16,7 @@ void handle_signals(int signum)
 {
 	if (signum == SIGCHLD || signum == SIGHUP)
 		return ;
-	(DEBUG) ? printf("error signal in payload") : 0;
+	(DEBUG) ? printf("error %d signal in payload\n", signum) : 0;
 	exit(EXIT_FAILURE);
 }
 
