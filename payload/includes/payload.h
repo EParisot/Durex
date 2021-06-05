@@ -30,7 +30,7 @@
 #include <sys/mman.h>
 #include <pthread.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define REMOTE_ADDR "0.0.0.0"
 #define REMOTE_PORT 4242

