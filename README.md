@@ -12,6 +12,13 @@ make
 ./pack_payload.sh
 ```
 
+### dump payloads:
+Clean the includes/durex.h (from the comment to the end of file),
+then:
+```
+./build_payloads.sh
+```
+
 ### run
 ```
 sudo ./Durex 
