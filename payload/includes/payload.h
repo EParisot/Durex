@@ -28,6 +28,7 @@
 #include <sys/time.h> //FD_SET, FD_ISSET, FD_ZERO macros 
 #include <sys/wait.h>
 #include <sys/mman.h>
+#include <pthread.h>
 
 #define DEBUG 1
 
@@ -36,6 +37,12 @@
 #define MAX_CLIENTS 3
 
 #define KEY "secret__password"
+
+typedef struct 	wait_args_s
+{
+	int 		pid;
+	int 		*clients_sockets;
+}				wait_args_t;
 
 int 	rabbit(char *input, const char *key);
 

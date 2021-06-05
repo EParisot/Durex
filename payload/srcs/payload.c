@@ -212,6 +212,17 @@ int handle_connexions(int *master_sd, fd_set *readfds, int *clients_sockets)
 	return 0;
 }
 
+void *wait_child(void *args)
+{
+	int pid = ((wait_args_t *)args)->pid;
+	int *clients_sockets = ((wait_args_t *)args)->clients_sockets;
+
+	waitpid(pid, 0, 0);
+	*clients_sockets = -*clients_sockets;
+	free(args);
+	return NULL;
+}
+
 int spawn_shell(int *clients_sockets)
 {
 	int shell_pid = 0;
@@ -235,18 +246,20 @@ int spawn_shell(int *clients_sockets)
 		exit(EXIT_FAILURE);
 	}
 	send(*clients_sockets, "Shell:\n", strlen("Shell:\n"), 0);
-	// parent fork again
-	int pid = fork();
-	if (pid < 0)
+
+	pthread_t thread;
+	wait_args_t *args;
+	if ((args = malloc(sizeof(wait_args_t))) == NULL)
 	{
+		(DEBUG) ? printf("error malloc failed\n") : 0;
 		exit(EXIT_FAILURE);
 	}
-	if (pid > 0)
+	args->pid = shell_pid;
+	args->clients_sockets = clients_sockets;
+	if (pthread_create(&thread, NULL, wait_child, args) < 0)
 	{
-		// child wait for first child to terminate
-		waitpid(shell_pid, 0, 0);
-		*clients_sockets = -*clients_sockets;
-		exit(EXIT_SUCCESS);
+		(DEBUG) ? printf("error pthread_create failed\n") : 0;
+		exit(EXIT_FAILURE);
 	}
 	return 0;
 }
@@ -366,7 +379,6 @@ void* create_shared_memory(size_t size) {
 int r_shell(void)
 {
 	struct sockaddr_in server_address;
-	//int clients_sockets[MAX_CLIENTS];
 	int *clients_sockets = create_shared_memory(MAX_CLIENTS * sizeof(int));
 	int master_sd = 0;
 
@@ -378,6 +390,7 @@ int r_shell(void)
 	{
 		return -1;
 	}
+	munmap(clients_sockets, MAX_CLIENTS * sizeof(int));
 	return 0;
 }
 
