@@ -57,6 +57,12 @@ int main(int argc, char *argv[])
 					return -1;
 				}
 			}
+			if (strcmp(argv[i], "-h") == 0 || strcmp(argv[i], "help") == 0)
+			{
+				printf("./client [-s SERVER_IP] [-p SERVER_PORT] [-k KEY]\n");
+				printf("SERVER_IP default \t: 127.0.0.1\nSERVER_PORT default \t: 4242\nKEY (16 chars) default \t: secret__password\n");
+				return -1;
+			}
 		}
 	}
 	server_addr.sin_port = htons(port);
