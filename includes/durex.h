@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define BIN_PATH "/usr/bin/Durex"
 #define SYSTEMD_DIR "/etc/systemd/system/Durex.service"
