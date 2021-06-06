@@ -112,7 +112,6 @@ int main(int argc, char *argv[])
 				printf("error: encrypting key\n");
 				break;
 			}
-			
 			send(sock, buffer, 17, 0);
 			valread = read(sock, buffer, 1024);
 			buffer[valread] = 0;
@@ -123,6 +122,7 @@ int main(int argc, char *argv[])
 			}
 			else
 			{
+				memset(key, 0, 1025);
 				close(sock);
 				sleep(1);
 				continue;
