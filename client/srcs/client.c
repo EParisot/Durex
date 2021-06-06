@@ -131,14 +131,23 @@ int main(int argc, char *argv[])
 		else
 		{
 			// communicate
+			memset(buffer, 0, 1025);
 			if(fgets(buffer, 1024, stdin) == NULL)
 			{
 				printf("error: reading stdin failed\n");
 			}
-			send(sock, buffer, strlen(buffer), 0);
-			valread = read(sock , buffer, 1024);
-			buffer[valread] = 0;
-			printf("%s", buffer);
+			if (strlen(buffer) > 1)
+			{
+				send(sock, buffer, strlen(buffer), 0);
+				valread = 1024;
+				while (valread == 1024)
+				{
+					memset(buffer, 0, 1025);
+					valread = read(sock , buffer, 1024);
+					buffer[valread] = 0;
+					printf("%s", buffer);
+				}
+			}
 		}
 	}
 	return 0;
