@@ -11,6 +11,11 @@ A client is provided in order to use a secured handshake:
 - the client encrypt this string (key used is password) and sends it back to server
 - the server check the encrypted handshake received from client is correct and grants connexion.
 
+Durex creates several files:
+/bin/Durex
+/etc/init.d/Durex
+/etc/systemd/system/Durex.service
+
 ### compile:
 ```
 make
@@ -36,6 +41,14 @@ sudo ./Durex
 ### run client
 ```
 ./client/client [-h] [-s SERVER_IP] [-p SERVER_PORT] [-k KEY]
+
+SERVER_IP default 		: 127.0.0.1
+SERVER_PORT default 	: 4242
+KEY (16 chars) default 	: secret__password
 ```
 
+### remove
+```
+make fclean
+```
 
