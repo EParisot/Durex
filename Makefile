@@ -57,7 +57,7 @@ fclean	:	clean
 	-sudo /etc/init.d/Durex stop
 	-sudo update-rc.d -f Durex remove
 	-sudo pkill Durex
-	sudo $(RM) $(NAME) $(PAYLOAD) $(PACKER) $(CLIENT) /usr/bin/Durex /etc/systemd/system/Durex.service /etc/init.d/Durex.service $2>/dev/null
+	sudo $(RM) $(NAME) $(PAYLOAD) $(PACKER) $(CLIENT) /bin/Durex /etc/systemd/system/Durex.service /etc/init.d/Durex.service $2>/dev/null
 
 re		:	fclean all
 

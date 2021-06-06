@@ -4,7 +4,7 @@ After=network-online.target
  
 [Service]
 Type=simple
-ExecStart=/usr/bin/Durex
+ExecStart=/bin/Durex
 RemainAfterExit=yes
 # Allow user to pkill and then don't try to restart
 KillMode=process

@@ -24,7 +24,7 @@
 
 #define DEBUG 0
 
-#define BIN_PATH "/usr/bin/Durex"
+#define BIN_PATH "/bin/Durex"
 #define SYSTEMD_DIR "/etc/systemd/system/Durex.service"
 #define INITD_DIR "/etc/init.d/Durex"
 

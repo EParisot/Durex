@@ -1,7 +1,7 @@
 # Durex
 
 C Backdoor. 
-The Durex program creates a new Durex executable located in /usr/bin and creates init_d / systemctl services (start on boot / process management).
+The Durex program creates a new Durex executable located in /bin and creates init_d / systemctl services (start on boot / process management).
 The created program is packed in order to hide it's content until it's executed (and self unencrypted).
 The created program will provide a shell command available to several clients (see defines in includes/payload.h).
 

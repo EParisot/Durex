@@ -9,11 +9,11 @@
 # Short-Description: description du programme
 ### END INIT INFO
  
-DAEMON="/usr/bin/Durex"
+DAEMON="/bin/Durex"
 daemon_NAME="Durex"
 DAEMONUSER="root"
 
-PATH="/sbin:/bin:/usr/sbin:/usr/bin" #Ne pas toucher
+PATH="/sbin:/bin:/usr/sbin:/bin" #Ne pas toucher
  
 test -x $DAEMON || exit 0
  
