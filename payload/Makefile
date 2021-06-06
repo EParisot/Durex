@@ -19,7 +19,7 @@ INC		=	includes/payload.h
 
 OBJS	=	$(SRCS:.c=.o)
 
-CFLAGS	=	-pthread -Wall -Wextra -Werror -g3
+CFLAGS	=	-pthread -Wall -Wextra -Werror -s
 
 RM 		= 	rm -rf
 

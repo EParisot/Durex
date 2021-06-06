@@ -24,7 +24,7 @@ PACKER  =	woody_woodpacker/woody_woodpacker
 
 CLIENT  =	client/client
 
-CFLAGS	=	-Wall -Wextra -Werror -g3
+CFLAGS	=	-Wall -Wextra -Werror
 
 RM 		= 	rm -rf
 
