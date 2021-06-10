@@ -26,6 +26,8 @@
 #define PORT 4242
 #define ADDR "127.0.0.1"
 
+#define TIMEOUT 1
+
 int 	rabbit(char *input, const char *key);
 
 #endif

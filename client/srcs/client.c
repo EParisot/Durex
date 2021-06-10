@@ -72,6 +72,10 @@ int main(int argc, char *argv[])
 	int secured = 0;
     char buffer[1025];
 
+	struct timeval tv;
+	tv.tv_sec = TIMEOUT;
+	tv.tv_usec = 0;
+
 	memset(buffer, 0, 1025);
 	while (1)
 	{
@@ -80,6 +84,13 @@ int main(int argc, char *argv[])
 			if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
 			{
 				printf("error: Creating Socket\n");
+				return -1;
+			}
+				// set socket options
+			if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof tv))
+			{
+				printf("error setting socket options\n");
+				close(sock);
 				return -1;
 			}
 			// connect to server
@@ -143,9 +154,9 @@ int main(int argc, char *argv[])
 				while (valread == 1024)
 				{
 					memset(buffer, 0, 1025);
-					valread = read(sock , buffer, 1024);
+					valread = read(sock, buffer, 1024);
 					buffer[valread] = 0;
-					printf("%s", buffer);
+					printf("%s\n", buffer);
 				}
 			}
 		}
