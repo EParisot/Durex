@@ -21,6 +21,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>
+#include <time.h>
 #include <termios.h>
 
 #define PORT 4242

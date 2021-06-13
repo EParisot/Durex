@@ -155,8 +155,15 @@ int main(int argc, char *argv[])
 				{
 					memset(buffer, 0, 1025);
 					valread = read(sock, buffer, 1024);
-					buffer[valread] = 0;
-					printf("%s\n", buffer);
+					if (valread > 0)
+					{
+						buffer[valread] = 0;
+						printf("%s", buffer);
+					}
+					else 
+					{
+						printf("\n");
+					}
 				}
 			}
 		}
